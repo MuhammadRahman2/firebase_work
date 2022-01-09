@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_firestore/screen/auth_screen.dart';
 
 class AuthForm extends StatefulWidget {
-  const AuthForm({Key? key}) : super(key: key);
+  const AuthForm({Key? key, required this.submitFn}) : super(key: key);
+
+  final void Function(
+    String userName,
+    String email,
+    String password,
+    bool isLogin,
+    BuildContext context
+  ) submitFn;
 
   @override
   _AuthFormState createState() => _AuthFormState();
@@ -18,11 +27,16 @@ class _AuthFormState extends State<AuthForm> {
     final isVaid = _fromKey.currentState!.validate();
     // entery done keybord auto gone
     FocusScope.of(context).unfocus();
+
     if (isVaid) {
       _fromKey.currentState!.save();
-      print(_username);
-      print(_userEmail);
-      print(_userPassword);
+      widget.submitFn(
+        _username.trim(),
+        _userEmail.trim(),
+        _userPassword.trim(),
+        _isLogin,
+        context
+      );
     }
   }
 
@@ -50,10 +64,11 @@ class _AuthFormState extends State<AuthForm> {
                           return null;
                         },
                         onSaved: (value) {
-                        _username = value!;
+                          _username = value!;
                         },
-                        decoration: const InputDecoration(labelText: 'user name'),
-                    ),
+                        decoration:
+                            const InputDecoration(labelText: 'user name'),
+                      ),
                     TextFormField(
                       key: const ValueKey('userEmail'),
                       keyboardType: TextInputType.emailAddress,
@@ -66,7 +81,9 @@ class _AuthFormState extends State<AuthForm> {
                       onSaved: (value) {
                         _userEmail = value!;
                       },
-                      decoration: const InputDecoration(labelText: 'Email'),
+                      decoration: const InputDecoration(
+                        labelText: 'Email',
+                      ),
                     ),
                     TextFormField(
                         key: const ValueKey('Password'),
@@ -81,7 +98,7 @@ class _AuthFormState extends State<AuthForm> {
                           _userPassword = value!;
                         },
                         decoration:
-                          const InputDecoration(labelText: 'password')),
+                            const InputDecoration(labelText: 'password')),
                     const SizedBox(
                       height: 10,
                     ),
@@ -90,15 +107,16 @@ class _AuthFormState extends State<AuthForm> {
                         style: ElevatedButton.styleFrom(
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15))),
-                        child:  Text( _isLogin ?'Login' : 'SignUp')),
+                        child: Text(_isLogin ? 'Login' : 'SignUp')),
                     TextButton(
                         onPressed: () {
                           setState(() {
-                          _isLogin = !_isLogin;
+                            _isLogin = !_isLogin;
                           });
                         },
-                        child:  Text(_isLogin ? 'Create Account': 'I have  already a account')
-                        )
+                        child: Text(_isLogin
+                            ? 'Create Account'
+                            : 'I have  already a account'))
                   ],
                 ),
               )),
